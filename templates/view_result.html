@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результат теста</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #2c3e50;
+        }
+
+        .result-container {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .result-header {
+            background: #f8fafc;
+            padding: 25px 35px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            border: 1px solid #edf2f7;
+        }
+
+        .result-card {
+            background: #f8fafc;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+            border: 1px solid #edf2f7;
+        }
+
+        .back-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .info-item {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #edf2f7;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .type-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        h2 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #1e293b;
+            margin: 0 0 20px 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .description-section {
+            margin-top: 35px;
+        }
+
+        .description-content {
+            background: #f8fafc;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+            border: 1px solid #edf2f7;
+        }
+
+        .description-content section {
+            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #edf2f7;
+        }
+
+        .description-content section:last-child {
+            margin-bottom: 0;
+        }
+
+        .description-content h5 {
+            color: #1e293b;
+            margin: 0 0 20px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .description-content h5::before {
+            content: "";
+            display: block;
+            width: 4px;
+            height: 24px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .description-content p {
+            color: #475569;
+            line-height: 1.7;
+            margin: 12px 0;
+            font-size: 1rem;
+        }
+
+        .description-content ul {
+            margin: 15px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .description-content li {
+            color: #475569;
+            margin: 10px 0;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 24px;
+            font-size: 1rem;
+        }
+
+        .description-content li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .phone-number {
+            color: #3b82f6;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .phone-number:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .download-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        @media print {
+            .button-group {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="button-group">
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Назад к списку</a>
+            <button onclick="downloadPDF()" class="download-btn">Скачать PDF</button>
+        </div>
+        
+        <div class="result-header">
+            <h2>Информация о тестируемом</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">ФИО ребенка</div>
+                    <div class="info-value">{{ result.child_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Класс</div>
+                    <div class="info-value">{{ result.grade }} класс</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Город/Область</div>
+                    <div class="info-value">{{ result.city }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Дата теста</div>
+                    <div class="info-value">{{ result.test_date.strftime('%d.%m.%Y %H:%M') }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Родитель</div>
+                    <div class="info-value">{{ result.parent_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Телефон</div>
+                    <div class="info-value">
+                        <a href="tel:{{ result.phone }}" class="phone-number">{{ result.phone }}</a>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Тип личности</div>
+                    <div class="info-value">
+                        {{ result.personality_type }}
+                        <div class="type-badge">{{ result.type_code }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if type_description %}
+        <div class="description-section">
+            <h3>Описание типа личности</h3>
+            <div class="description-content">
+                {{ type_description|safe }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <script>
+        function downloadPDF() {
+            // Получаем контейнер с результатами
+            const element = document.querySelector('.result-container');
+            
+            // Конфигурация для html2pdf
+            const opt = {
+                margin: [10, 10],
+                filename: 'результат_теста.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+
+            // Генерируем PDF
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html> 

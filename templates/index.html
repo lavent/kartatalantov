@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Опросник</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="survey-container">
+        <div class="survey-card">
+            <div class="question-counter">
+                Вопрос <span id="current-question">1</span> из <span id="total-questions">0</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress-fill"></div>
+            </div>
+            <h2 id="question-text">{{ question.text|escape if question else 'Вопросы не загружены'|escape }}</h2>
+            <div class="rating-container">
+                <div class="answers-list" id="answers-container">
+                    {% if question and question.answers %}
+                        {% for answer in question.answers %}
+                            <div class="answer-option" onclick="submitAnswer('{{ answer.id|escape }}')">
+                                {{ answer.text|escape }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

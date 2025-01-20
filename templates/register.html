@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация на тест</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="survey-container">
+        <div class="survey-card register-card">
+            <h2>Регистрация на тест</h2>
+            <form class="register-form" action="{{ url_for('register') }}" method="POST">
+                <div class="form-group">
+                    <label for="parent_name">ФИО родителя</label>
+                    <input type="text" id="parent_name" name="parent_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="child_name">ФИО ребенка</label>
+                    <input type="text" id="child_name" name="child_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Номер телефона</label>
+                    <div class="phone-input-container">
+                        <span class="phone-prefix">+7 </span>
+                        <input type="tel" 
+                               id="phone" 
+                               name="phone" 
+                               class="phone-input"
+                               placeholder="(900) 123-45-67"
+                               required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="grade">Класс</label>
+                    <select id="grade" name="grade" required>
+                        <option value="">Выберите класс</option>
+                        <option value="3">3 класс</option>
+                        <option value="4">4 класс</option>
+                        <option value="5">5 класс</option>
+                        <option value="6">6 класс</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="city">Город/Область</label>
+                    <select id="city" name="city" required>
+                        <option value="">Выберите город/область</option>
+                        <option value="город Астана">город Астана</option>
+                        <option value="город Алматы">город Алматы</option>
+                        <option value="город Шымкент">город Шымкент</option>
+                        <option value="Алматинская область">Алматинская область</option>
+                        <option value="Актюбинская область">Актюбинская область</option>
+                        <option value="Атырауская область">Атырауская область</option>
+                        <option value="Акмолинская область">Акмолинская область</option>
+                        <option value="Западно-Казахстанская область">Западно-Казахстанская область</option>
+                        <option value="Восточно-Казахстанская область">Восточно-Казахстанская область</option>
+                        <option value="Жамбылская область">Жамбылская область</option>
+                        <option value="Карагандинская область">Карагандинская область</option>
+                        <option value="Костанайская область">Костанайская область</option>
+                        <option value="Кызылординская область">Кызылординская область</option>
+                        <option value="Мангистауская область">Мангистауская область</option>
+                        <option value="Северо-Казахстанская область">Северо-Казахстанская область</option>
+                        <option value="Павлодарская область">Павлодарская область</option>
+                        <option value="Туркестанская область">Туркестанская область</option>
+                        <option value="Область Абай">Область Абай</option>
+                        <option value="Область Жетісу">Область Жетісу</option>
+                        <option value="Область Ұлытау">Область Ұлытау</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn">Пройти тест</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Форматирование телефонного номера
+        const phoneInput = document.getElementById('phone');
+        
+        function formatPhone(value) {
+            // Убираем все нецифровые символы
+            const numbers = value.replace(/\D/g, '');
+            
+            // Ограничиваем длину 10 цифрами
+            const trimmed = numbers.slice(0, 10);
+            
+            // Форматируем номер
+            let formatted = '';
+            if (trimmed.length > 0) {
+                formatted = `(${trimmed.slice(0, 3)}`;
+                if (trimmed.length > 3) {
+                    formatted += `) ${trimmed.slice(3, 6)}`;
+                }
+                if (trimmed.length > 6) {
+                    formatted += `-${trimmed.slice(6, 8)}`;
+                }
+                if (trimmed.length > 8) {
+                    formatted += `-${trimmed.slice(8)}`;
+                }
+            }
+            
+            return formatted;
+        }
+
+        phoneInput.addEventListener('input', function(e) {
+            const cursorPosition = this.selectionStart;
+            const previousLength = this.value.length;
+            
+            this.value = formatPhone(this.value);
+            
+            // Восстанавливаем позицию курсора
+            const newLength = this.value.length;
+            const cursorOffset = newLength - previousLength;
+            this.setSelectionRange(cursorPosition + cursorOffset, cursorPosition + cursorOffset);
+        });
+
+        // Обработка фокуса
+        phoneInput.addEventListener('focus', function(e) {
+            if (!this.value) {
+                this.value = '(';
+                this.setSelectionRange(1, 1);
+            }
+        });
+
+        // Обработка потери фокуса
+        phoneInput.addEventListener('blur', function(e) {
+            if (this.value === '(') {
+                this.value = '';
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,418 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+    font-family: Arial, sans-serif;
+}
+
+.survey-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.survey-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+}
+
+.rating-container {
+    padding: 20px 0;
+}
+
+.rating-scale {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.rating-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.numbers {
+    display: flex;
+    gap: 40px;
+}
+
+.numbers span {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.numbers span:hover {
+    background-color: #4ecdc4;
+    border-color: #4ecdc4;
+    color: white;
+}
+
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+}
+
+.answer-option {
+    padding: 15px 20px;
+    background-color: #f5f5f5;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.answer-option:hover {
+    background-color: #4ecdc4;
+    border-color: #4ecdc4;
+    color: white;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+    transition: width 0.3s ease;
+}
+
+.question-counter {
+    text-align: right;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.question-counter span {
+    font-weight: bold;
+    color: #333;
+}
+
+.results-card {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.scores-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+.score-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 0;
+}
+
+.score-label {
+    width: 30px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.score-progress {
+    flex-grow: 1;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    margin: 0 10px;
+}
+
+.score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+    transition: width 0.5s ease;
+}
+
+.score-value {
+    width: 30px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.leading-types {
+    margin-bottom: 30px;
+}
+
+.type-descriptions {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.type-description {
+    margin-bottom: 20px;
+}
+
+.type-description h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.profile-description {
+    margin-top: 20px;
+}
+
+.profile-description section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.profile-description h5 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.profile-description ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.profile-description li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 10px;
+    color: #495057;
+    line-height: 1.6;
+}
+
+.profile-description li:before {
+    content: "•";
+    color: #4ecdc4;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.profile-description p {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.highlight-box {
+    background: #e8f5e9;
+    border-left: 4px solid #4ecdc4;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.score-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.score-title {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.results-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.results-section-title {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #4ecdc4;
+}
+
+.results-content {
+    padding: 10px 0;
+}
+
+.register-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.form-group label {
+    color: #2c3e50;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    height: 45px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #4ecdc4;
+    outline: none;
+}
+
+.form-group select {
+    cursor: pointer;
+    background-color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+/* Убираем стили валидации с красной обводкой */
+.form-group input:invalid,
+.form-group select:invalid {
+    border-color: #e9ecef;  /* Используем обычный цвет границы */
+}
+
+.form-group input:valid,
+.form-group select:valid {
+    border-color: #4ecdc4;
+}
+
+/* Добавляем стили для поля телефона */
+.phone-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.phone-prefix {
+    position: absolute;
+    left: 12px;
+    color: #2c3e50;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.phone-input {
+    padding-left: 45px !important;
+    width: 100%;
+}
+
+.user-info {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.user-info h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #4ecdc4;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(78,205,196,0.25);
+}
+
+.test-content {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.test-content.visible {
+    opacity: 1;
+} 
