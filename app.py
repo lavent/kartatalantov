@@ -13,7 +13,10 @@ import re
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
-from config import Config
+try:
+    from config import Config
+except ImportError:
+    from config_example import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
