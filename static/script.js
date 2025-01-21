@@ -2,6 +2,38 @@ let currentQuestionIndex = 0;
 let questions = [];
 let answers = {};
 
+// В начало файла добавим получение CSRF-токена
+function getCSRFToken() {
+    const tokenInput = document.querySelector('input[name="csrf_token"]');
+    if (!tokenInput) {
+        console.error('CSRF token input not found');
+        return null;
+    }
+    return tokenInput.value;
+}
+
+function fetchWithCSRF(url, options = {}) {
+    const token = getCSRFToken();
+    if (!token) {
+        throw new Error('CSRF token not found');
+    }
+
+    const defaultOptions = {
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token
+        },
+        ...options,
+        headers: {
+            ...options.headers,
+            'X-CSRF-TOKEN': token
+        }
+    };
+    
+    return fetch(url, defaultOptions);
+}
+
 // Загрузка вопросов при старте
 fetch('/api/questions')
     .then(response => {
@@ -95,13 +127,24 @@ function submitAnswer(questionId, answerId, categoryKey, weight) {
     };
     
     currentQuestionIndex++;
-    showQuestion(currentQuestionIndex);
+    
+    if (currentQuestionIndex < questions.length) {
+        showQuestion(currentQuestionIndex);
+    } else {
+        // Если это был последний вопрос, анализируем результаты
+        analyzeResults();
+    }
 }
 
 function analyzeResults() {
-    const results = {};
-    
+    if (currentQuestionIndex < questions.length) {
+        console.log('Тест еще не завершен');
+        return;
+    }
+
     try {
+        console.log('Начинаем анализ результатов...');
+        const categoryScores = {};
         for (const category in answers) {
             if (Object.prototype.hasOwnProperty.call(answers, category)) {
                 let score = 0;
@@ -115,32 +158,69 @@ function analyzeResults() {
                         }
                     }
                 }
-                
-                results[category] = score;
+                categoryScores[category] = score;
             }
         }
 
-        // Отправляем результаты на сервер вместо сохранения в localStorage
+        console.log('Подсчитанные баллы:', categoryScores);
+
+        let maxScore = 0;
+        let dominantType = '';
+        
+        for (const category in categoryScores) {
+            if (categoryScores[category] > maxScore) {
+                maxScore = categoryScores[category];
+                dominantType = category;
+            }
+        }
+
+        console.log('Доминирующий тип:', dominantType);
+
+        const resultData = {
+            personality_type: dominantType,
+            type_code: dominantType,
+            scores: categoryScores
+        };
+
+        console.log('Отправляем данные на сервер:', resultData);
+
+        const token = getCSRFToken();
+        if (!token) {
+            throw new Error('CSRF токен не найден');
+        }
+
         fetch('/api/save-results', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content
+                'X-CSRF-TOKEN': token
             },
-            body: JSON.stringify(results)
+            body: JSON.stringify(resultData)
         })
         .then(response => {
+            console.log('Получен ответ от сервера:', response.status);
             if (!response.ok) {
-                throw new Error('Failed to save results');
+                return response.text().then(text => {
+                    throw new Error(`Ошибка сервера: ${response.status}, ${text}`);
+                });
             }
-            window.location.href = '/results';
+            return response.json();
+        })
+        .then(data => {
+            console.log('Получены данные:', data);
+            if (data.success) {
+                window.location.href = '/results';
+            } else {
+                throw new Error(data.error || 'Ошибка сохранения результатов');
+            }
         })
         .catch(error => {
-            console.error('Error saving results:', error);
+            console.error('Ошибка при сохранении результатов:', error);
             alert('Произошла ошибка при сохранении результатов. Пожалуйста, попробуйте еще раз.');
         });
     } catch (error) {
-        console.error('Error analyzing results:', error);
+        console.error('Ошибка при анализе результатов:', error);
         alert('Произошла ошибка при обработке результатов. Пожалуйста, попробуйте еще раз.');
     }
 } 

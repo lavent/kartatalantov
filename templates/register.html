@@ -11,6 +11,7 @@
         <div class="survey-card register-card">
             <h2>Регистрация на тест</h2>
             <form class="register-form" action="{{ url_for('register') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="parent_name">ФИО родителя</label>
                     <input type="text" id="parent_name" name="parent_name" required>

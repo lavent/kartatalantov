@@ -30,6 +30,9 @@
             </div>
         </div>
     </div>
+    <form id="csrf-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html> 

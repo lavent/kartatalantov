@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_migrate import Migrate
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 import json
 import pandas as pd
 import os
@@ -12,13 +13,20 @@ import re
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
+from config import Config
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
-# Конфигурация базы данных
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test_results.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+# Инициализация CSRF защиты
+csrf = CSRFProtect(app)
+
+# Настройка CSRF для AJAX запросов
+@app.after_request
+def add_csrf_header(response):
+    if 'text/html' in response.headers['Content-Type']:
+        response.set_cookie('csrf_token', generate_csrf())
+    return response
 
 # Добавляем фильтр для преобразования datetime в date
 @app.template_filter('datetime_to_date')
@@ -74,8 +82,35 @@ def get_questions():
 @app.route('/results')
 def results():
     try:
+        # Получаем данные регистрации и результаты теста из сессии
         registration_data = session.get('registration_data', {})
-        return render_template('results.html', registration_data=registration_data)
+        test_results = session.get('test_results', {})
+        
+        if not test_results:
+            return redirect(url_for('register'))
+            
+        # Получаем описание типа из CSV файла
+        try:
+            df = pd.read_csv('karta_talantov_type.csv')
+            type_data = df.to_dict('records')
+            type_description = None
+            
+            if test_results.get('type_code'):
+                type_match = next((t for t in type_data if test_results['type_code'] in t['type_simbol'].split('/')), None)
+                if type_match:
+                    type_description = format_description(type_match['discription'])
+        except Exception as e:
+            print(f"Ошибка при чтении описания типа: {str(e)}")
+            type_description = None
+        
+        # После успешного отображения результатов очищаем данные сессии
+        session.pop('registration_data', None)
+        session.pop('test_results', None)
+        
+        return render_template('results.html',
+                             registration_data=registration_data,
+                             test_results=test_results,
+                             type_description=type_description)
     except Exception as e:
         print(f"Ошибка при отображении результатов: {e}")
         return "Ошибка при отображении страницы результатов", 500
@@ -111,59 +146,75 @@ def register():
         return redirect(url_for('index'))
     return render_template('register.html')
 
-@app.route('/save-results', methods=['POST'])
+@app.route('/api/save-results', methods=['POST'])
 def save_results():
     try:
+        print("Получен запрос на сохранение результатов")
         data = request.get_json()
+        print("Полученные данные:", data)
+        
         registration_data = session.get('registration_data', {})
+        print("Данные регистрации из сессии:", registration_data)
         
         # Проверяем наличие всех необходимых данных
         if not registration_data:
+            print("Ошибка: нет данных регистрации")
             return jsonify({'success': False, 'error': 'Нет данных регистрации'}), 400
             
         required_fields = ['parent_name', 'child_name', 'phone', 'grade', 'city']
         missing_fields = [field for field in required_fields if not registration_data.get(field)]
         if missing_fields:
+            print("Ошибка: отсутствуют обязательные поля:", missing_fields)
             return jsonify({
                 'success': False, 
                 'error': f'Отсутствуют обязательные поля: {", ".join(missing_fields)}'
             }), 400
 
         if not data.get('personality_type') or not data.get('type_code'):
+            print("Ошибка: отсутствуют данные о типе личности")
             return jsonify({
                 'success': False,
                 'error': 'Отсутствуют данные о типе личности'
             }), 400
         
+        print("Создаем запись в базе данных")
         # Создаем новую запись в базе данных
         test_result = TestResult(
             parent_name=registration_data.get('parent_name'),
             child_name=registration_data.get('child_name'),
             phone=registration_data.get('phone'),
             grade=registration_data.get('grade'),
-            city=registration_data.get('city'),  # Добавляем город
+            city=registration_data.get('city'),
             personality_type=data.get('personality_type'),
             type_code=data.get('type_code'),
             is_completed=True
         )
         
         try:
+            print("Сохраняем в базу данных")
             db.session.add(test_result)
             db.session.commit()
+            
+            print("Сохраняем результаты в сессии")
+            # Сохраняем результаты в сессии для отображения на странице результатов
+            session['test_results'] = {
+                'personality_type': data.get('personality_type'),
+                'type_code': data.get('type_code'),
+                'scores': data.get('scores', {})
+            }
+            
+            print("Успешно сохранено")
+            return jsonify({'success': True})
         except Exception as db_error:
             db.session.rollback()
-            print(f"Database error: {str(db_error)}")
+            print(f"Ошибка базы данных: {str(db_error)}")
             return jsonify({
                 'success': False,
                 'error': 'Ошибка при сохранении в базу данных'
             }), 500
         
-        # Очищаем данные сессии только после успешного сохранения
-        session.pop('registration_data', None)
-        
-        return jsonify({'success': True})
     except Exception as e:
-        print(f"Error saving results: {str(e)}")
+        print(f"Общая ошибка: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Простая модель пользователя для админа
