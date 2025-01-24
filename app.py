@@ -228,11 +228,7 @@ def save_results():
 class Admin(UserMixin):
     def __init__(self, id):
         self.id = id
-        self.name = 'admin'
-        self.password = generate_password_hash('admin')
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
+        self.name = app.config['ADMIN_USERNAME']
 
 # Создаем единственного админа
 admin = Admin(1)
@@ -249,7 +245,7 @@ def admin_login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username == 'admin' and password == 'admin':
+        if username == app.config['ADMIN_USERNAME'] and password == app.config['ADMIN_PASSWORD']:
             login_user(admin)
             return redirect(url_for('admin_dashboard'))
         return render_template('admin_login.html', error='Неверный логин или пароль')
