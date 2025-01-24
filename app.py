@@ -13,10 +13,7 @@ import re
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
-try:
-    from config import Config
-except ImportError:
-    from config_example import Config
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -485,4 +482,4 @@ def export_excel():
         return "Ошибка при экспорте данных", 500
 
 if __name__ == '__main__':
-    app.run() 
+    app.run(debug=True, host='127.0.0.1', port=5001) 

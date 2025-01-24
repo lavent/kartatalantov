@@ -123,19 +123,24 @@ async function displayResults(results) {
         
         const scoreBar = document.createElement('div');
         scoreBar.className = 'score-bar';
+        
+        const categoryName = getCategoryName(category);
+        // Добавляем многоточие, если название слишком длинное
+        const truncatedName = categoryName.length > 20 ? categoryName.slice(0, 20) + '...' : categoryName;
+        
         scoreBar.innerHTML = `
-            <div class="score-label">${category}</div>
+            <div class="score-label" title="${categoryName}">${truncatedName}</div>
             <div class="score-progress">
                 <div class="score-fill" style="width: ${percentage}%"></div>
             </div>
-            <div class="score-value">${score}</div>
+            <div class="score-value">${score} баллов</div>
         `;
         scoresContainer.appendChild(scoreBar);
     });
 
     // Получаем два ведущих типа
     const [firstType, secondType] = sortedResults.slice(0, 2).map(([type]) => type);
-    const typeSymbols = getTypeSymbols(firstType, secondType);
+    const typeSymbols = [firstType, secondType].sort().join('+');
 
     // Находим соответствующее описание в данных из CSV
     const typeDescription = typeData.find(t => {
@@ -152,6 +157,7 @@ async function displayResults(results) {
             <div class="score-container">
                 <div class="score-title">Ваш тип личности:</div>
                 <h3>${typeDescription.type}</h3>
+                <div class="type-code">${typeSymbols}</div>
             </div>
         `;
         
@@ -170,9 +176,30 @@ async function displayResults(results) {
             // Можно добавить уведомление для пользователя
         }
     } else {
-        topTypesContainer.innerHTML = `${firstType} и ${secondType}`;
+        const firstTypeName = getCategoryName(firstType);
+        const secondTypeName = getCategoryName(secondType);
+        topTypesContainer.innerHTML = `
+            <div class="score-container">
+                <div class="score-title">Ваш тип личности:</div>
+                <h3>${firstTypeName} + ${secondTypeName}</h3>
+                <div class="type-code">${typeSymbols}</div>
+            </div>
+        `;
         descriptionsContainer.innerHTML = '<p>Описание для данной комбинации типов не найдено.</p>';
     }
+}
+
+// Функция для получения названия категории
+function getCategoryName(category) {
+    const categoryNames = {
+        'R': 'Реалистический',
+        'I': 'Исследовательский',
+        'A': 'Артистический',
+        'S': 'Социальный',
+        'E': 'Предпринимательский',
+        'C': 'Конвенциональный'
+    };
+    return categoryNames[category] || category;
 }
 
 // Получаем результаты из localStorage и отображаем их

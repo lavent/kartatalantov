@@ -145,6 +145,8 @@ function analyzeResults() {
     try {
         console.log('Начинаем анализ результатов...');
         const categoryScores = {};
+        
+        // Подсчитываем баллы для каждой категории
         for (const category in answers) {
             if (Object.prototype.hasOwnProperty.call(answers, category)) {
                 let score = 0;
@@ -164,21 +166,22 @@ function analyzeResults() {
 
         console.log('Подсчитанные баллы:', categoryScores);
 
-        let maxScore = 0;
-        let dominantType = '';
-        
-        for (const category in categoryScores) {
-            if (categoryScores[category] > maxScore) {
-                maxScore = categoryScores[category];
-                dominantType = category;
-            }
-        }
+        // Сортируем типы по баллам
+        const sortedTypes = Object.entries(categoryScores)
+            .sort(([,a], [,b]) => b - a);
 
-        console.log('Доминирующий тип:', dominantType);
+        // Получаем два ведущих типа
+        const [firstType, secondType] = sortedTypes.slice(0, 2).map(([type]) => type);
+        
+        // Создаем код типа, сортируя буквы в алфавитном порядке
+        const typeCode = [firstType, secondType].sort().join('+');
+        
+        console.log('Ведущие типы:', firstType, secondType);
+        console.log('Код типа:', typeCode);
 
         const resultData = {
-            personality_type: dominantType,
-            type_code: dominantType,
+            personality_type: `${firstType}+${secondType}`,
+            type_code: typeCode,
             scores: categoryScores
         };
 
@@ -210,6 +213,8 @@ function analyzeResults() {
         .then(data => {
             console.log('Получены данные:', data);
             if (data.success) {
+                // Сохраняем результаты в localStorage перед переходом
+                localStorage.setItem('testResults', JSON.stringify(categoryScores));
                 window.location.href = '/results';
             } else {
                 throw new Error(data.error || 'Ошибка сохранения результатов');
