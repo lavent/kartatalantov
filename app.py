@@ -13,10 +13,17 @@ import re
 import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill
 import io
-from config import Config
 
 app = Flask(__name__)
-app.config.from_object(Config)
+
+# Настройка конфигурации
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME')
+app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///test_results.db')
+if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Инициализация CSRF защиты
 csrf = CSRFProtect(app)
